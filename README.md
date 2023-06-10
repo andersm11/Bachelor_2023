@@ -17,7 +17,7 @@ simple_experiment: Used for simple 3x3 PCA experiment from section 5.1.5
 
 Image_Inpainting_Autoencoder_Decoder_v2_0.ipynb: Used for reconstruction with neural network
 
-data-z.py: Used to prepare for use in neural network
+data-z.py: Used to prepare data for use in neural network
 
 ## motion
 
