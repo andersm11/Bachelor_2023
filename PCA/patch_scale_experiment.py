@@ -95,8 +95,6 @@ def get_patches(data, rs, window_size):
 def get_component_count(window_size, rs):
     
     patches = get_patches(X[3], rs, window_size)
-
-
     pca = PCA(n_components=window_size*window_size)
     pca.fit(patches)
 
