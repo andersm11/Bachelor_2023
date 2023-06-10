@@ -23,6 +23,7 @@ X = X[200]
 
 # generate random coordinates
 def filter_isolated_cells(array, struct):
+    #https://stackoverflow.com/questions/28274091/removing-completely-isolated-cells-from-python-array
     """ Return array with completely isolated single cells removed
     :param array: Array with completely isolated single cells
     :param struct: Structure array for generating unique regions
