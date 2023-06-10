@@ -23,9 +23,12 @@ data-z.py: Used to prepare data for use in neural network
 
 compute_angle.py: Used to display motion and rotation. Also computes the rotation of the midpiece
 
-skeletoniez.py: Used for skeletonizing and projections using PCA
+skeletonize.py: Used for skeletonizing and projections using PCA
 
 tif_separator.py: Used to separate .tif files where all layers and timesteps are saved under same variable. Outputs .tif files where each file is a timestep.
+
+(Skeletonize cells and save output -> separate .tif files into timesteps -> compute angles)
+
 
 ## Misc
 confusion_calculation.py: Used to calculate confusion matrix of segmentations and groundtruths
