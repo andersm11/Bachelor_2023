@@ -4,10 +4,10 @@ import numpy as np
 
 
 # Path to the input hyperstack TIFF file
-input_file = "C:\\Users\\ahmm9\\Desktop\\segmentation_things\\synthetic_z_348_front_recon_flipped.tif"
+input_file = "synthetic_z_348_front_recon_flipped.tif"
 
 # Output directory to save the split TIFF files
-output_directory = "C:\\Users\\ahmm9\\desktop\\segmentation_things\\"
+output_directory = "segmentation_things\\"
 
 
 # Number of time steps and slices per time step
@@ -18,13 +18,13 @@ slices_per_time_step = 48
 crop_x = 0
 crop_y = 0
 tif_image = tiff.imread(input_file)
-print(tif_image.shape)
+
 
 # Open the input TIFF file
 with tiff.TiffFile(input_file) as tif:
     # Read the TIFF stack
     stack = tif.asarray()
-    print(stack.shape)
+    
     # Check if the stack has the expected dimensions
     
     if len(stack.shape) == 4:
