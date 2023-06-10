@@ -14,7 +14,6 @@ def filter_isolated_cells(array, struct):
         :param struct: Structure array for generating unique regions
         :return: Array with minimum region size > 1
         """
-
         filtered_array = np.copy(array)
         id_regions, num_ids = ndimage.label(filtered_array, structure=struct)
         id_sizes = np.array(ndimage.sum(array, id_regions, range(num_ids + 1)))
@@ -64,8 +63,6 @@ def random_coordinates_all(data, n, window_size, max):
         time = random.randint(0, time_max)
         layer = random.randint(0, layer_max)
         rs = random_coordinates(data[time], n, window_size, time, layer)
-        length = len(rs)
-        #print("Time:",time, "layer:",layer, "found", length, "patches")
         for r in rs:
             rs_full.append(r)
     return rs_full
@@ -83,7 +80,6 @@ def random_coordinates_all2(data, n, window_size, max):
         rs = random_coordinates(data[time], n, window_size, time, layer)
         length = len(rs)
         if(length == 99856 or length == 135424): length = 0
-        #print("Time:",time, "layer:",layer, "found", length, "patches")
         counter = counter + 1
         results.append((time, layer, length))
     return results
@@ -145,7 +141,6 @@ def patch_2_vec(patch):
 def remove_row_from_patch(patch, n, window_size, mu):
     removed = np.copy(patch)
     for i in range( window_size):
-        #removed[row][i] = mu[i]    # Potentiel idé
         mu_index = (n * window_size) + i
         removed[n][i] = (mu[mu_index])       # vil ignorer de principal components vi ikke kender.
     return removed
@@ -153,7 +148,6 @@ def remove_row_from_patch(patch, n, window_size, mu):
 def set_row_zero(patch, n, window_size):
     removed = np.copy(patch)
     for i in range( window_size):
-        #removed[row][i] = mu[i]    # Potentiel idé
         index = i
         removed[n][index] = 0
     return removed
@@ -209,7 +203,6 @@ def find_min_and_max(data):
 
 def change_range(vector, min, max, new_min, new_max):
     length = len(vector) 
-    #print(length)
     for i in range(length):
         new_number = (vector[i]-min)/(max - min ) * new_max
         if(new_number>255): new_number = 255.0
@@ -223,7 +216,4 @@ def change_range_patches(patches, min, max, new_min, new_max):
     for i in range(length):
         if(i%10 == 0): print(i, "/", length)
         new[i] = change_range(new[i], min, max, new_min, new_max)
-    print(len(new))
-    print(len(new[0]))
-    print(new[0])
     return new

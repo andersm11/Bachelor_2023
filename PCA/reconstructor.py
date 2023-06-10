@@ -4,13 +4,6 @@ import math
 import patch_manager as pmang
 
 
-
-
-#Read tiff
-
-
-# https://stackoverflow.com/questions/28274091/removing-completely-isolated-cells-from-python-array
-
 class Reconstructor:
     
     Vecs = []
@@ -18,7 +11,6 @@ class Reconstructor:
     mu = []
     got_pca = False
     n_var = 0
-    
     
     def get_n_variance(self, pca, variance):
         '''returns the number of components need to have (variance)%'''
@@ -30,9 +22,7 @@ class Reconstructor:
         return n
 
     def get_pca(self,patches :np.ndarray, variance=1.0, n_componets = 0):
-        '''
-            Makes PCA and saves the vectors, eigen values and mean in Reconstructor object
-        '''
+        '''Makes PCA and saves the vectors, eigen values and mean in Reconstructor object'''
         pca = PCA(svd_solver="full")
         pca.fit(patches)
         self.Eig = pca.singular_values_
@@ -104,7 +94,6 @@ class Reconstructor:
 
                 removed  = np.copy(patch)
                 for k in range(len(patch)):
-                    #((i+k)%32) % 7 
                     if((i+k) % nth != 0):
                         removed = pmang.remove_row_from_patch(removed, k, window_size, self.mu)
 
@@ -115,7 +104,6 @@ class Reconstructor:
 
                 row_index = int(win_minus_1/2)*win_minus_1+int(win_minus_1/2)
                 recon[x][y] = recon_patch[row_index]
-                #print(j,"/",Y-window_size)
             print(i,"/",X-window_size)
         return recon
 

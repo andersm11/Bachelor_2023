@@ -16,15 +16,10 @@ from scipy import ndimage
 
 
 #Read tiff
-X = io.imread('c:\\users\\blomst\\sperm_0p2_70hz_6t_00064.BTF')  # (3000, 12, 400, 400)
+X = io.imread('sperm_0p2_70hz_6t_00064.BTF')  # (3000, 12, 400, 400)
 
 X = X[200]
 
-#Read white noise
-#X = io.imread('C:\\Users\\ahmm9\\Desktop\\whitenoise.jpg')
-
-# length of square grid
-# window_size = 16 <---- ???? it is not used
 
 # generate random coordinates
 def filter_isolated_cells(array, struct):
@@ -45,9 +40,7 @@ def filter_isolated_cells(array, struct):
 def threshhold_and_dialate(img):
     thresh = threshold_triangle(img)
     binary = img > thresh
-
     removed_loners = filter_isolated_cells(binary, struct=np.ones((3,3)))
-
     return dilation(removed_loners, disk(30))
 
 def random_coordinates(img, n, window_size):
@@ -57,7 +50,6 @@ def random_coordinates(img, n, window_size):
     img.save("Dialated.png")
     rs = binary_to_coordinate(dialation, window_size)
     random.shuffle(rs)
-    print(len(rs))
     return rs[:n]
 
 def binary_to_coordinate(binary, window_size):
@@ -73,8 +65,6 @@ def binary_to_coordinate(binary, window_size):
     return coordinates
 
 
-def vec_2_patch(vec, window_size):
-    return vec.reshape((window_size, window_size))
 
 # Get a patch from array given windows_size and top-right corner in x,y
 def get_patch_jon(data, x, y, window_size):
@@ -83,17 +73,7 @@ def get_patch_jon(data, x, y, window_size):
     row.shape = (len(row),1)
     return row
         
-# Get patches and format into PCA ready array, given coordinate set rs and windows_size
-def get_patches_jon(data, rs, window_size):
-    patches = np.array([])
-    for r in rs:
-        patch = get_patch_jon(data, r[0], r[1], window_size)
-        if patches.size == 0:
-            patch.shape = (len(patch), 1)
-            patches = patch
-        else:
-            patches = np.concatenate((patches, patch), axis=1)
-    return patches
+
 
 def get_patch(data, x, y, window_size):
     patch = data[x:x + window_size, y:y + window_size]
@@ -103,7 +83,6 @@ def get_patch(data, x, y, window_size):
 # Get patches and format into PCA ready array, given coordinate set rs and windows_size
 def get_patches(data, rs, window_size):
     patches = np.array([])
-    #print(data.shape)
     for r in rs:
         patch = get_patch(data, r[0], r[1], window_size)
         if len(patches) == 0:
@@ -112,25 +91,10 @@ def get_patches(data, rs, window_size):
             patches = np.append(patches, [patch], axis=0)
     return patches
 
-def save_original(n):
-    img = Image.fromarray(X[n])
-    path = "C:\\Users\\ahmm9\\Desktop\\original_" + str(n) + ".png"
-    img = img.convert('RGB')
-    img.save(path)
-
-def make_directory(path):
-    isExist = os.path.exists(path)
-    if not isExist:
-        # Create a new directory because it does not exist
-        os.makedirs(path)
-    return 1
     
-def estim_components(window_size): 
-    return int(((6.8995 * window_size) - 56.0418))
-
 def get_component_count(window_size, rs):
-    n = 3 # what is this??
-    patches = get_patches(X[n], rs, window_size)
+    
+    patches = get_patches(X[3], rs, window_size)
 
 
     pca = PCA(n_components=window_size*window_size)
@@ -164,7 +128,6 @@ def display_component_count():
             count +=2
             rs = random_coordinates(dilation, patches_n, i)
             n = get_component_count(i, rs)
-            #print("n: ",n)
             comp_count = np.append(comp_count,n/i**2)
             
         if(len(result) == 0):
@@ -175,9 +138,7 @@ def display_component_count():
     
     result = np.mean(result, axis=0)
     ran = range(10, len(result) + 10)
-    print("comp_count_average:", result)
     plt.plot(ran, result, 'ro')
-    #plt.axis([1, len(comp_count) + 1, 0, 0.2])
     plt.xlabel("Patch size")
     plt.ylabel("Components")
     plt.show()

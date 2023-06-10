@@ -36,8 +36,8 @@ for i in range(len(V)):
     print(mu + (V[i]*np.sqrt(E[i])))
 print()
 
-path = "e:\\simple_eigen_vectors_img\\"
-#recon.save_principal_components_as_image(3, path, 3)
+path = "simple_eigen_vectors_img\\"
+
 print(recon.n_var)
 good = recon.reconstruct_patch(np.array(patch_left), recon.n_var)
 
@@ -60,4 +60,4 @@ print(bad_patch)
 pmang.show_patch_as_image(bad_patch,"2")
 
 
-pmang.save_patch_as_image(bad_patch, path= "e:\\bad.png")
+pmang.save_patch_as_image(bad_patch, path= "bad.png")
