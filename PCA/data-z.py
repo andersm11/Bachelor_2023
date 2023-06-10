@@ -13,14 +13,18 @@ save_path  = 'C:\\Users\\Blomst\\z\\1\\'                         # Dataset 1
 sperm_path2 = 'C:\\Users\\Blomst\\sperm_0p2_40hz_12t_00068.BTF'  # Dataset 0 - 348x348x12 -> 348  / 141 * 20 / 12 = 4.11 [157,7]
 save_path2 = 'C:\\Users\\Blomst\\z\\0\\'                         # Dataset 0
 
-print("loading", sperm_path)
-X = io.imread(sperm_path)
+print("loading", sperm_path2)
+#X = io.imread(sperm_path)
+
+test = io.imread('c:\\users\\blomst\\documents\\segmentationbaby.tif')
+print(np.shape(test))
+
 Y = io.imread(sperm_path2)
 
-#timestep = 157 #Time: 157 layer: 7 found 10000 patches YYYYY
-
-timestep = 797 #Time: 209 layer: 3 found 10000 patches
+timestep = 50 #Time: 209 layer: 3 found 10000 patches
 layer = 6
+
+
 
 def remove_nth_row(X, nth):
     I = len(X)
@@ -37,7 +41,7 @@ def remove_nth_row(X, nth):
     return out
 
 images1 = Y[timestep]
-images2 = X[timestep]
+#images2 = X[timestep]
 
 
 #(timestep, layers, y, x)
@@ -56,31 +60,72 @@ full_path2 = save_path2 + str(timestep) + ".npy"
 print("yeet")
 
 
+def create_X_Z(X, time_start, timesteps, start_x, end_x, img_len, z_height=48, nth_row=4, row_in_z_start=1):
+    # Z = (time, x, z, 400)
+    Z = np.zeros((timesteps, (end_x - start_x),z_height, img_len))
+    for t in range(timesteps):
+        # q is row in image and layer in Z
+        for q in range(start_x,end_x):
+            row_in_z = row_in_z_start
+            #Iterate each layer for a timestep
+            for image in X[time_start + t]:
+                # j is column
+                for j in range(len(image[2])):
+                    Z[t][q-start_1][row_in_z][j] = image[q][j]     #[104-114][alle][135-165][alle]
+                row_in_z = (row_in_z + nth_row) % 48
+    return Z
+
+def create_Y_Z(X, time_start, timesteps, start_y, end_y, img_len, z_height=48, nth_row=4, row_in_z_start=1):
+    Z = np.zeros((timesteps, img_len,z_height, (end_y - start_y)))
+    print(np.shape(Z))
+
+    for t in range(timesteps):
+        # q is column in image and layer in Z
+        for q in range(start_y,end_y):
+            row_in_z = row_in_z_start
+            #Iterate each layer for a timestep
+            for image in X[time_start + t]:
+                # j is column
+                for j in range(len(image[2])):
+                    Z[t][j][row_in_z][q-start_1] = image[j][q]     #[104-114][alle][135-165][alle]
+                row_in_z = (row_in_z + nth_row) % 48
+    return Z
 
 
-start_1, end_1 = 0, 249
-
-timesteps = 3
+#rows
+start_1, end_1 = 150, 285
+timesteps = 10
 
 
 time_start = timestep 
 time_end = time_start + timesteps
 
 
-Z1 = np.zeros((timesteps, (end_1 - start_1),48, 400))
+Z1  = create_X_Z(Y, time_start,timesteps, start_1, end_1, 348, 48, 4, 1)
+
+Z1 = Z1[:,:,:,55:100]
+
+print(np.shape(Z1))
+np.save("c:\\users\\blomst\\YZ.npy", Z1)
+
+exit()
+Z1 = np.zeros((timesteps, (end_1 - start_1),48, 348))
 #Z2 = np.zeros((timesteps, 2,50, 400))
 
 for t in range(timesteps):
+    # q is rows
     for q in range(start_1,end_1):
-        c1 = 5
-        for image in X[time_start + t]:
+        c1 = 1
+        #Iterate each layer for a timestep
+        for image in Y[time_start + t]:
+            # j is column
             for j in range(len(image[2])):
                 Z1[t][q-start_1][c1][j] = image[q][j]     #[104-114][alle][135-165][alle]
-            c1 = (c1 + 7) % 50
+            c1 = (c1 + 4) % 48
 
 
-np.save(full_path, Z1)
-print(np.shape(Z1))
+#create_Y_Z(Y, time_start,timesteps, start_1, end_1, 348, 48, 4, 1)
+
 
 
 pmang.show_patch_as_image(Z1[0,0])

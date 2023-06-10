@@ -1,0 +1,186 @@
+from PIL import Image
+from matplotlib import pyplot as plt
+from sklearn.preprocessing import StandardScaler
+import numpy as np
+from skimage import io
+from sklearn.decomposition import PCA
+import random
+from numpy.linalg import svd
+import os
+import matplotlib.pyplot as plt 
+from skimage.filters import threshold_triangle
+from skimage.morphology import disk
+from skimage.morphology import dilation
+from scipy import ndimage
+
+
+
+#Read tiff
+X = io.imread('c:\\users\\blomst\\sperm_0p2_70hz_6t_00064.BTF')  # (3000, 12, 400, 400)
+
+X = X[200]
+
+#Read white noise
+#X = io.imread('C:\\Users\\ahmm9\\Desktop\\whitenoise.jpg')
+
+# length of square grid
+# window_size = 16 <---- ???? it is not used
+
+# generate random coordinates
+def filter_isolated_cells(array, struct):
+    """ Return array with completely isolated single cells removed
+    :param array: Array with completely isolated single cells
+    :param struct: Structure array for generating unique regions
+    :return: Array with minimum region size > 1
+    """
+
+    filtered_array = np.copy(array)
+    id_regions, num_ids = ndimage.label(filtered_array, structure=struct)
+    id_sizes = np.array(ndimage.sum(array, id_regions, range(num_ids + 1)))
+    area_mask = (id_sizes <= 5)
+    filtered_array[area_mask[id_regions]] = 0
+    return filtered_array
+
+
+def threshhold_and_dialate(img):
+    thresh = threshold_triangle(img)
+    binary = img > thresh
+
+    removed_loners = filter_isolated_cells(binary, struct=np.ones((3,3)))
+
+    return dilation(removed_loners, disk(30))
+
+def random_coordinates(img, n, window_size):
+    dialation = threshhold_and_dialate(img)
+    img = Image.fromarray(dialation)
+    img = img.convert('RGB')
+    img.save("Dialated.png")
+    rs = binary_to_coordinate(dialation, window_size)
+    random.shuffle(rs)
+    print(len(rs))
+    return rs[:n]
+
+def binary_to_coordinate(binary, window_size):
+    coordinates = []
+
+    X, Y = binary.shape
+    X = X - window_size
+    Y = Y - window_size
+    for x in range(X):
+        for y in range(Y):
+            if(binary[x][y]):
+                coordinates.append((x,y))
+    return coordinates
+
+
+def vec_2_patch(vec, window_size):
+    return vec.reshape((window_size, window_size))
+
+# Get a patch from array given windows_size and top-right corner in x,y
+def get_patch_jon(data, x, y, window_size):
+    patch = data[x:x + window_size, y:y + window_size]
+    row = patch.reshape(-1)
+    row.shape = (len(row),1)
+    return row
+        
+# Get patches and format into PCA ready array, given coordinate set rs and windows_size
+def get_patches_jon(data, rs, window_size):
+    patches = np.array([])
+    for r in rs:
+        patch = get_patch_jon(data, r[0], r[1], window_size)
+        if patches.size == 0:
+            patch.shape = (len(patch), 1)
+            patches = patch
+        else:
+            patches = np.concatenate((patches, patch), axis=1)
+    return patches
+
+def get_patch(data, x, y, window_size):
+    patch = data[x:x + window_size, y:y + window_size]
+    row = patch.reshape(-1)
+    return row
+        
+# Get patches and format into PCA ready array, given coordinate set rs and windows_size
+def get_patches(data, rs, window_size):
+    patches = np.array([])
+    #print(data.shape)
+    for r in rs:
+        patch = get_patch(data, r[0], r[1], window_size)
+        if len(patches) == 0:
+            patches = np.array([patch])
+        else:
+            patches = np.append(patches, [patch], axis=0)
+    return patches
+
+def save_original(n):
+    img = Image.fromarray(X[n])
+    path = "C:\\Users\\ahmm9\\Desktop\\original_" + str(n) + ".png"
+    img = img.convert('RGB')
+    img.save(path)
+
+def make_directory(path):
+    isExist = os.path.exists(path)
+    if not isExist:
+        # Create a new directory because it does not exist
+        os.makedirs(path)
+    return 1
+    
+def estim_components(window_size): 
+    return int(((6.8995 * window_size) - 56.0418))
+
+def get_component_count(window_size, rs):
+    n = 3 # what is this??
+    patches = get_patches(X[n], rs, window_size)
+
+
+    pca = PCA(n_components=window_size*window_size)
+    pca.fit(patches)
+
+    var = pca.explained_variance_ratio_[0:50]
+    ran = range(1, len(var) + 1)
+
+    sum_var = 0.0
+    for i in range(len(pca.singular_values_)):
+
+        if(sum_var > 0.95):
+            return i
+            break
+        var = pca.explained_variance_ratio_[i]
+        #print(i ," : " , var)
+        sum_var = sum_var + var
+
+
+def display_component_count():
+    result = np.array([])
+    n=3
+    patches_n = 8192
+    dilation = threshhold_and_dialate(X[n])
+
+    for j in range(1):
+        comp_count = []
+        count = 0   
+        for i in range(10,33,2):
+            print(str(j) + ", " + str(i))
+            count +=2
+            rs = random_coordinates(dilation, patches_n, i)
+            n = get_component_count(i, rs)
+            #print("n: ",n)
+            comp_count = np.append(comp_count,n/i**2)
+            
+        if(len(result) == 0):
+            result = np.array([comp_count])
+        else:
+            result = np.append(result, [comp_count], axis=0)
+        print(result)
+    
+    result = np.mean(result, axis=0)
+    ran = range(10, len(result) + 10)
+    print("comp_count_average:", result)
+    plt.plot(ran, result, 'ro')
+    #plt.axis([1, len(comp_count) + 1, 0, 0.2])
+    plt.xlabel("Patch size")
+    plt.ylabel("Components")
+    plt.show()
+    return result
+
+display_component_count()

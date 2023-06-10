@@ -65,7 +65,7 @@ def random_coordinates_all(data, n, window_size, max):
         layer = random.randint(0, layer_max)
         rs = random_coordinates(data[time], n, window_size, time, layer)
         length = len(rs)
-        print("Time:",time, "layer:",layer, "found", length, "patches")
+        #print("Time:",time, "layer:",layer, "found", length, "patches")
         for r in rs:
             rs_full.append(r)
     return rs_full
@@ -83,7 +83,7 @@ def random_coordinates_all2(data, n, window_size, max):
         rs = random_coordinates(data[time], n, window_size, time, layer)
         length = len(rs)
         if(length == 99856 or length == 135424): length = 0
-        print("Time:",time, "layer:",layer, "found", length, "patches")
+        #print("Time:",time, "layer:",layer, "found", length, "patches")
         counter = counter + 1
         results.append((time, layer, length))
     return results
