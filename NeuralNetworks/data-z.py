@@ -25,7 +25,6 @@ timestep = 50
 layer = 6
 
 
-
 def remove_nth_row(X, nth):
     I = len(X)
     J = len(X[0])
@@ -43,17 +42,10 @@ def remove_nth_row(X, nth):
 images1 = Y[timestep]
 
 
-
-
-
 full_path = save_path + str(timestep) + ".npy"
 full_path2 = save_path2 + str(timestep) + ".npy"
 
-
-
-
 def create_X_Z(X, time_start, timesteps, start_x, end_x, img_len, z_height=48, nth_row=4, row_in_z_start=1):
-    # Z = (time, x, z, 400)
     Z = np.zeros((timesteps, (end_x - start_x),z_height, img_len))
     for t in range(timesteps):
         # q is row in image and layer in Z

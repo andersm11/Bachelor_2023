@@ -1,6 +1,5 @@
 from PIL import Image
 from matplotlib import pyplot as plt
-from sklearn.preprocessing import StandardScaler
 import numpy as np
 from skimage import io
 from sklearn.decomposition import PCA

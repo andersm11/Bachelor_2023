@@ -1,9 +1,7 @@
 import os
 from skimage import io
 from tifffile import imwrite
-from PIL import Image
 import numpy as np
-import patch_manager as pmang
 import cv2 as cv
 
 import random
