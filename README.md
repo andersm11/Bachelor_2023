@@ -9,7 +9,7 @@ reconstructor.py: Class used for reconstruction of 3D images
 
 patch_scale_experiment.py: Used for experiment that shows the corelation between patch size and amount of principal components. (Old design, but works) 
 
-PCA_recon_final.ipynb: Used for reconstructing using PCA. Results are shown in report 
+PCA_recon_final.ipynb: Used for reconstructing (using PCA) results shown in report.
 
 simple_experiment: Used for simple 3x3 PCA experiment from section 5.1.5
 
