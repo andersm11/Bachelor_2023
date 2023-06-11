@@ -38,7 +38,7 @@ def create_line(points,mean_point):
     return line_points
 
 def plot_points_and_vectors(points):
-    # Define the fixed x coordinate
+
     
     mean_point = find_center_point(points,USEHEAD)
 
@@ -60,7 +60,7 @@ def plot_points_and_vectors(points):
 
 
 
-    # Compute the time difference between points
+
     time_diff = 0.3
     time_values = np.arange(0, len(points) * time_diff, time_diff)
 
@@ -73,7 +73,7 @@ def plot_points_and_vectors(points):
     ax.scatter(x, max(y)*2, z, c='r', marker='o',s=8)
     ax.scatter(-1, y, z, c='r', marker='o',s=8)
 
-    # Convert RGBA color values to RGB
+    # Convert RGBA color values to RGB and plot mean lines
     colors = cm.get_cmap('viridis')(normalized_values)
     colors = colors[:, :3]
     ax.plot(mean_line[:, 0], mean_line[:, 1], mean_line[:, 2], 'r')
@@ -89,8 +89,6 @@ def plot_points_and_vectors(points):
         ax.plot([x[i-1], x[i]], [y[i-1], y[i]], [min(z)*2,min(z)*2], color='red', alpha=0.8, linewidth=1.2)
         ax.plot([x[i-1], x[i]], [max(y)*2,max(y)*2], [z[i-1], z[i]], color='green', alpha=0.8, linewidth=1.2)
         ax.plot([min(x)-1,min(x)-1], [y[i-1], y[i]], [z[i-1], z[i]], color='blue', alpha=0.8, linewidth=1.2)
-        
-        
     
     # Set labels and title
     ax.set_xlabel('Time(0.3s. increment)')
@@ -106,19 +104,14 @@ input = input("Use head axis as center?(y/n): " )
 USEHEAD = 0
 if input =="y" or input == "yes":
     USEHEAD = 1
-input_path = "C:\\Users\\ahmm9\\desktop\\segmentation_things\\seg2\\tail_points\\"
+input_path = "tail_points\\"
 
 points = []
 for t in range(1,11):
     points.append(np.load(input_path + "point" + str(t)+".npy"))
 
 
-
-
-
-dt = 0.3  # Time difference between each point
-
-
+# Some cells are not alligned the same direction, so we rotate them so they align the same direction
 for p in range(len(points)):
     if points[p][0] < 0:
         points[p][0] = 40
@@ -137,7 +130,7 @@ def calculate_rotation_angle(points, central_point):
     for point in points:
         Px, Py, Pz = point
         
-        # Calculate the relative coordinates of the point with respect to the central point
+
         relative_x = Px - Cx
         relative_y = Py - Cy
         relative_z = Pz - Cz
@@ -176,20 +169,21 @@ angle_differences = calculate_angle_differences(rotational_angles)
 print("Rotational Angles:", rotational_angles)
 print("Angle Differences:", angle_differences)
 
-
+#This display the correct angles as text, but visually it shows the smallest angles between points. Not used in report
 def display_angles_3d(points, angles):
-    # Create a 3D plot
+
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     
     # Plot the points
     xs = [0 for p in points]
     central_point = find_center_point(points,USEHEAD)
-    
     ys = [p[1] for p in points]
     zs = [p[2] for p in points]
+    
     central_point = find_center_point(points,USEHEAD)
     central_point[0] = 0
+    
     for i in range(len(xs) - 1):
         xs[i + 1] = xs[i] + 0.3
         
@@ -199,10 +193,6 @@ def display_angles_3d(points, angles):
     
 
     mean_line = create_line(xs,central_point)
-
-    # Compute the time difference between points
-    time_diff = 0.3
-    time_values = np.arange(0, len(xs) * time_diff, time_diff)
     
     offset = 0.15
     
